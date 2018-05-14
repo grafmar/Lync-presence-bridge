@@ -6,22 +6,25 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ColorAvailable" Type="System.String" Scope="User">
-      <Value Profile="(Default)">255,0,0</Value>
+      <Value Profile="(Default)">0,255,0</Value>
     </Setting>
     <Setting Name="ColorAvailableIdle" Type="System.String" Scope="User">
-      <Value Profile="(Default)">255,255,0</Value>
+      <Value Profile="(Default)">0,255,0</Value>
     </Setting>
     <Setting Name="ColorBusy" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0,0,255</Value>
+      <Value Profile="(Default)">255,0,0</Value>
     </Setting>
     <Setting Name="ColorBusyIdle" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0,255,255</Value>
+      <Value Profile="(Default)">255,0,0</Value>
     </Setting>
     <Setting Name="ColorAway" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0,50,0</Value>
+      <Value Profile="(Default)">200,200,0</Value>
     </Setting>
     <Setting Name="ColorOff" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0,0,0</Value>
+      <Value Profile="(Default)">0,0,50</Value>
+    </Setting>
+    <Setting Name="ColorDoNotDisturb" Type="System.String" Scope="User">
+      <Value Profile="(Default)">255,0,255</Value>
     </Setting>
   </Settings>
 </SettingsFile>

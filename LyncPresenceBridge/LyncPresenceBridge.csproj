@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\traffic lights.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\AppIcon_mix.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HidLibrary, Version=3.2.36.0, Culture=neutral, processorArchitecture=MSIL">
@@ -124,9 +124,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icon1.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.2 %28x86 und x64%29</ProductName>
@@ -139,16 +136,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\blink_off.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Arduino\Uctrl.Arduino.csproj">
       <Project>{10691731-8a35-4f2a-9a8b-b60d2c626015}</Project>
       <Name>Uctrl.Arduino</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\traffic lights.ico" />
+    <Content Include="Resources\AppIcon_mix.ico" />
+    <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

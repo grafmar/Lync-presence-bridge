@@ -3,6 +3,8 @@ using System;
 using System.Windows.Forms;
 
 using Microsoft.Lync.Model;
+using Microsoft.Lync.Model.Conversation;
+using System.Text;
 
 using ThingM.Blink1;
 using ThingM.Blink1.ColorProcessor;
@@ -26,6 +28,8 @@ namespace LyncPresenceBridge
 
         private ManagementEventWatcher usbWatcher;
 
+		private System.Timers.Timer stateCheckTimer;
+
         private bool isLyncIntegratedMode = true;
 
         private static string[] colorAvailable = Properties.Settings.Default.ColorAvailable.Split(',');
@@ -33,24 +37,33 @@ namespace LyncPresenceBridge
         private static string[] colorBusy = Properties.Settings.Default.ColorBusy.Split(',');
         private static string[] colorBusyIdle = Properties.Settings.Default.ColorBusyIdle.Split(',');
         private static string[] colorAway = Properties.Settings.Default.ColorAway.Split(',');
-        private static string[] colorOff = Properties.Settings.Default.ColorOff.Split(',');
+		private static string[] colorDoNotDisturb = Properties.Settings.Default.ColorDoNotDisturb.Split(',');
+		private static string[] colorOff = Properties.Settings.Default.ColorOff.Split(',');
 
-        private Rgb blinkColorAvailable = new Rgb(0, 150, 17);
-        private Rgb blinkColorAvailableIdle = new Rgb(0, 150, 17);
-        private Rgb blinkColorBusy = new Rgb(150, 0, 0);
-        private Rgb blinkColorBusyIdle = new Rgb(150, 0, 0);
-        private Rgb blinkColorAway = new Rgb(150, 150, 0);
-        private Rgb blinkColorOff = new Rgb(0, 0, 0);
+		private byte[] arduinoColorAvailable = Array.ConvertAll(colorAvailable, s => Convert.ToByte(s));
+		private byte[] arduinoColorAvailableIdle = Array.ConvertAll(colorAvailableIdle, s => Convert.ToByte(s));
+		private byte[] arduinoColorBusy = Array.ConvertAll(colorBusy, s => Convert.ToByte(s));
+		private byte[] arduinoColorBusyIdle = Array.ConvertAll(colorBusyIdle, s => Convert.ToByte(s));
+		private byte[] arduinoColorAway = Array.ConvertAll(colorAway, s => Convert.ToByte(s));
+		private byte[] arduinoColorDoNotDisturb = Array.ConvertAll(colorDoNotDisturb, s => Convert.ToByte(s));
+		private byte[] arduinoColorOff = Array.ConvertAll(colorOff, s => Convert.ToByte(s));
 
-        private byte[] arduinoColorAvailable = Array.ConvertAll(colorAvailable, s => Convert.ToByte(s));
-        private byte[] arduinoColorAvailableIdle = Array.ConvertAll(colorAvailableIdle, s => Convert.ToByte(s));
-        private byte[] arduinoColorBusy = Array.ConvertAll(colorBusy, s => Convert.ToByte(s));
-        private byte[] arduinoColorBusyIdle = Array.ConvertAll(colorBusyIdle, s => Convert.ToByte(s));
-        private byte[] arduinoColorAway = Array.ConvertAll(colorAway, s => Convert.ToByte(s));
-        private byte[] arduinoColorOff = Array.ConvertAll(colorOff, s => Convert.ToByte(s));
+		private static Rgb colorToRgb(string[] strArray)
+		{
+			Rgb returnRgb = new Rgb(Convert.ToByte(strArray[0]), Convert.ToByte(strArray[1]), Convert.ToByte(strArray[2]));
+			return returnRgb;
+		}
+
+		private Rgb blinkColorAvailable = colorToRgb(colorAvailable);
+        private Rgb blinkColorAvailableIdle = colorToRgb(colorAvailableIdle);
+        private Rgb blinkColorBusy = colorToRgb(colorBusy);
+		private Rgb blinkColorBusyIdle = colorToRgb(colorBusyIdle);
+		private Rgb blinkColorAway = colorToRgb(colorAway);
+		private Rgb blinkColorDoNotDisturb = colorToRgb(colorDoNotDisturb);
+		private Rgb blinkColorOff = colorToRgb(colorOff);
 
 
-        public LyncConnectorAppContext()
+		public LyncConnectorAppContext()
         {
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnApplicationExit);
@@ -78,9 +91,13 @@ namespace LyncPresenceBridge
             // Watch for USB Changes, try to monitor blink plugin/removal
             InitializeUSBWatcher();
 
-        }
+			stateCheckTimer = new System.Timers.Timer(15000);
+			stateCheckTimer.Elapsed += OnTimedStateCheckEvent;
+			stateCheckTimer.AutoReset = true;
+			stateCheckTimer.Enabled = true;
+		}
 
-        private bool InitializeBlink1()
+		private bool InitializeBlink1()
         {
             try
             {
@@ -105,7 +122,7 @@ namespace LyncPresenceBridge
             trayIcon = new NotifyIcon();
 
             //The icon is added to the project resources.
-            trayIcon.Icon = Properties.Resources.blink_off;
+            trayIcon.Icon = Properties.Resources.TrayIcon;
 
             // TrayIconContextMenu
             trayIconContextMenu = new ContextMenuStrip();
@@ -147,11 +164,16 @@ namespace LyncPresenceBridge
                 lyncClient.StateChanged += lyncClient_StateChanged;
                 
                 if (lyncClient.State == ClientState.SignedIn)
+                {
                     lyncClient.Self.Contact.ContactInformationChanged += Contact_ContactInformationChanged;
-    
+                    lyncClient.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
+                    lyncClient.ConversationManager.ConversationRemoved += ConversationManager_ConversationRemoved;
+                }
+
                 SetCurrentContactState();
-            }
-            catch (ClientNotFoundException)
+				SetLyncIntegrationMode(true);
+			}
+			catch (ClientNotFoundException)
             {
                 Debug.WriteLine("Lync Client not started.");
 
@@ -171,12 +193,6 @@ namespace LyncPresenceBridge
         void SetLyncIntegrationMode(bool isLyncIntegrated)
         {
             isLyncIntegratedMode = isLyncIntegrated;
-            if (isLyncIntegratedMode)
-            {
-            }
-            else
-            {
-            }
         }
 
         /// <summary>
@@ -219,8 +235,8 @@ namespace LyncPresenceBridge
                         break;
 
                     case ContactAvailability.DoNotDisturb:      // Do not disturb
-                        blinkColor = blinkColorBusy;
-                        arduinoLeds = arduinoColorBusy;
+                        blinkColor = blinkColorDoNotDisturb;
+                        arduinoLeds = arduinoColorDoNotDisturb;
                         break;
 
                     case ContactAvailability.Offline:           // Offline
@@ -262,8 +278,7 @@ namespace LyncPresenceBridge
 
         void SetIconState(Rgb color)
         {
-                
-            using (Bitmap b = Bitmap.FromHicon(new Icon( Properties.Resources.blink_off , 48, 48).Handle))
+            using (Bitmap b = Bitmap.FromHicon(new Icon( Properties.Resources.TrayIcon , 48, 48).Handle))
             {
                 if (color.Blue == 0 && color.Green == 0 && color.Red == 0)
                 {
@@ -272,11 +287,11 @@ namespace LyncPresenceBridge
                 else
                 {
                     Graphics g = Graphics.FromImage(b);
-                    g.FillRegion(new SolidBrush(Color.FromArgb(color.Red, color.Green, color.Blue)), new Region(new Rectangle(20, 29, 22, 27)));
+					g.FillRegion(new SolidBrush(Color.FromArgb(color.Red, color.Green, color.Blue)), new Region(new Rectangle(11, 5, 26, 24)));
+					g.FillRegion(new SolidBrush(Color.FromArgb(100, color.Red, color.Green, color.Blue)), new Region(new Rectangle(10,4,28,26)));
+				}
 
-                }
-
-                IntPtr Hicon = b.GetHicon();
+				IntPtr Hicon = b.GetHicon();
                 Icon newIcon = Icon.FromHandle(Hicon);
                 trayIcon.Icon = newIcon;
             }
@@ -293,7 +308,7 @@ namespace LyncPresenceBridge
                     break;
 
                 case ClientState.ShuttingDown:
-                    break;
+					break;
 
                 case ClientState.SignedIn:
                     lyncClient.Self.Contact.ContactInformationChanged += Contact_ContactInformationChanged;
@@ -302,7 +317,8 @@ namespace LyncPresenceBridge
 
                 case ClientState.SignedOut:
                     trayIcon.ShowBalloonTip(1000, "", "You signed out in Lync. Switching to manual mode.", ToolTipIcon.Info);
-                    break;
+					SetLyncIntegrationMode(false);
+					break;
 
                 case ClientState.SigningIn:
                     break;
@@ -326,7 +342,50 @@ namespace LyncPresenceBridge
             }
         }
 
-        private void OnApplicationExit(object sender, EventArgs e)
+        void ConversationManager_ConversationAdded(object sender, ConversationManagerEventArgs e)
+        {
+            arduino.SetCallerId(e.Conversation.Participants[1].Contact.GetContactInformation(ContactInformationType.DisplayName).ToString());
+        }
+
+        void ConversationManager_ConversationRemoved(object sender, ConversationManagerEventArgs e)
+        {
+            arduino.ClearCallerId();
+
+			if (lyncClient.State == ClientState.SignedIn) {
+				int numOfConversations = lyncClient.ConversationManager.Conversations.Count;
+				if (numOfConversations != 0)
+				{
+					Conversation lastConversation = lyncClient.ConversationManager.Conversations[numOfConversations - 1];					
+					arduino.SetCallerId(lastConversation.Participants[1].Contact.GetContactInformation(ContactInformationType.DisplayName).ToString());
+				}
+			}
+		}
+
+		private void OnTimedStateCheckEvent(Object source, System.Timers.ElapsedEventArgs e)
+		{
+			// Try to reconnect to serial port if connection was lost
+			if (!arduino.Port.IsOpen)
+			{
+				arduino.Dispose();
+				if (Properties.Settings.Default.ArduinoSerialPort > 0)
+				{
+					arduino.OpenPort("COM" + Properties.Settings.Default.ArduinoSerialPort.ToString());
+					// timing problem if we set the state to fast after connection, wait 1000ms
+					Thread.Sleep(1000);
+				}
+			}
+
+			// Try to reconnect to Lync/Skype
+			//if (!isLyncIntegratedMode)
+			//{
+			//	GetLyncClient();
+			//}
+
+
+			SetCurrentContactState();
+		}
+
+		private void OnApplicationExit(object sender, EventArgs e)
         {
             //Cleanup so that the icon will be removed when the application is closed
             trayIcon.Visible = false;

@@ -23,10 +23,12 @@ namespace Uctrl.Arduino
             try
             {
                 serialPort.PortName = port;
-                serialPort.BaudRate = 9600;
+                serialPort.BaudRate = 115200;
                 serialPort.ReadTimeout = 1000;
                 serialPort.WriteTimeout = 1000;
+				serialPort.Handshake = Handshake.None;
                 serialPort.NewLine = "\n";
+                serialPort.Encoding = Encoding.GetEncoding("ISO-8859-1");
                 serialPort.Open();
 
                 return serialPort.IsOpen;
@@ -74,7 +76,17 @@ namespace Uctrl.Arduino
 
         public bool SetLEDs(byte[] colors)
         {
-            return Send(string.Join(",", colors));
+            return Send("rgb:" + string.Join(",", colors));
+        }
+
+        public bool SetCallerId(string callerId)
+        {
+            return Send("callerid:" + callerId);
+        }
+		
+        public bool ClearCallerId()
+        {
+            return Send("callerid:");
         }
     }
 }

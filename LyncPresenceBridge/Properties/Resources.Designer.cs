@@ -63,9 +63,9 @@ namespace LyncPresenceBridge.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon blink_off {
+        internal static System.Drawing.Icon AppIcon_mix {
             get {
-                object obj = ResourceManager.GetObject("blink_off", resourceCulture);
+                object obj = ResourceManager.GetObject("AppIcon_mix", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace LyncPresenceBridge.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Icon1 {
+        internal static System.Drawing.Icon TrayIcon {
             get {
-                object obj = ResourceManager.GetObject("Icon1", resourceCulture);
+                object obj = ResourceManager.GetObject("TrayIcon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

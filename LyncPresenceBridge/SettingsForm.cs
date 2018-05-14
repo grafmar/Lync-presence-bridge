@@ -30,10 +30,13 @@ namespace LyncPresenceBridge
             byte[] colorBusy = { (byte)numColorBusy1.Value, (byte)numColorBusy2.Value, (byte)numColorBusy3.Value };
             Properties.Settings.Default.ColorBusy = string.Join(",", colorBusy);
 
-            byte[] colorBusyIdle = { (byte)numColorBusyIdle1.Value, (byte)numColorBusyIdle2.Value, (byte)numColorBusyIdle3.Value };
-            Properties.Settings.Default.ColorBusyIdle = string.Join(",", colorBusyIdle);
+			byte[] colorBusyIdle = { (byte)numColorBusyIdle1.Value, (byte)numColorBusyIdle2.Value, (byte)numColorBusyIdle3.Value };
+			Properties.Settings.Default.ColorBusyIdle = string.Join(",", colorBusyIdle);
 
-            byte[] colorAway = { (byte)numColorAway1.Value, (byte)numColorAway2.Value, (byte)numColorAway3.Value };
+			byte[] colorDoNotDisturb = { (byte)numColorDoNotDisturb1.Value, (byte)numColorDoNotDisturb2.Value, (byte)numColorDoNotDisturb3.Value };
+			Properties.Settings.Default.ColorDoNotDisturb = string.Join(",", colorDoNotDisturb);
+
+			byte[] colorAway = { (byte)numColorAway1.Value, (byte)numColorAway2.Value, (byte)numColorAway3.Value };
             Properties.Settings.Default.ColorAway = string.Join(",", colorAway);
 
             byte[] colorOff = { (byte)numColorOff1.Value, (byte)numColorOff2.Value, (byte)numColorOff3.Value };
@@ -67,7 +70,12 @@ namespace LyncPresenceBridge
             numColorBusyIdle2.Value = colorBusyIdle[1];
             numColorBusyIdle3.Value = colorBusyIdle[2];
 
-            byte[] colorAway = Array.ConvertAll(Properties.Settings.Default.ColorAway.Split(','), s => Convert.ToByte(s));
+			byte[] colorDoNotDisturb = Array.ConvertAll(Properties.Settings.Default.ColorDoNotDisturb.Split(','), s => Convert.ToByte(s));
+			numColorDoNotDisturb1.Value = colorDoNotDisturb[0];
+			numColorDoNotDisturb2.Value = colorDoNotDisturb[1];
+			numColorDoNotDisturb3.Value = colorDoNotDisturb[2];
+
+			byte[] colorAway = Array.ConvertAll(Properties.Settings.Default.ColorAway.Split(','), s => Convert.ToByte(s));
             numColorAway1.Value = colorAway[0];
             numColorAway2.Value = colorAway[1];
             numColorAway3.Value = colorAway[2];

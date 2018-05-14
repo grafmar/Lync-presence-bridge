@@ -37,7 +37,7 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255,0,0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,255,0")]
         public string ColorAvailable {
             get {
                 return ((string)(this["ColorAvailable"]));
@@ -49,7 +49,7 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255,255,0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,255,0")]
         public string ColorAvailableIdle {
             get {
                 return ((string)(this["ColorAvailableIdle"]));
@@ -61,7 +61,7 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0,0,255")]
+        [global::System.Configuration.DefaultSettingValueAttribute("255,0,0")]
         public string ColorBusy {
             get {
                 return ((string)(this["ColorBusy"]));
@@ -73,7 +73,7 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0,255,255")]
+        [global::System.Configuration.DefaultSettingValueAttribute("255,0,0")]
         public string ColorBusyIdle {
             get {
                 return ((string)(this["ColorBusyIdle"]));
@@ -85,7 +85,7 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0,50,0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("200,200,0")]
         public string ColorAway {
             get {
                 return ((string)(this["ColorAway"]));
@@ -97,13 +97,25 @@ namespace LyncPresenceBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,50")]
         public string ColorOff {
             get {
                 return ((string)(this["ColorOff"]));
             }
             set {
                 this["ColorOff"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255,0,255")]
+        public string ColorDoNotDisturb {
+            get {
+                return ((string)(this["ColorDoNotDisturb"]));
+            }
+            set {
+                this["ColorDoNotDisturb"] = value;
             }
         }
     }
