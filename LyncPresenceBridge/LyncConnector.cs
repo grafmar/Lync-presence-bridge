@@ -62,6 +62,30 @@ namespace LyncPresenceBridge
 		private Rgb blinkColorDoNotDisturb = colorToRgb(colorDoNotDisturb);
 		private Rgb blinkColorOff = colorToRgb(colorOff);
 
+		private static Icon colorToIcon(string[] strArray)
+        {
+			Rgb color = new Rgb(Convert.ToByte(strArray[0]), Convert.ToByte(strArray[1]), Convert.ToByte(strArray[2]));
+
+            using (Bitmap b = Bitmap.FromHicon(new Icon( Properties.Resources.TrayIcon , 48, 48).Handle))
+            {
+                Graphics g = Graphics.FromImage(b);
+				g.FillRegion(new SolidBrush(Color.FromArgb(color.Red, color.Green, color.Blue)), new Region(new Rectangle(11, 5, 26, 24)));
+				g.FillRegion(new SolidBrush(Color.FromArgb(100, color.Red, color.Green, color.Blue)), new Region(new Rectangle(10,4,28,26)));
+
+				IntPtr Hicon = b.GetHicon();
+                Icon newIcon = Icon.FromHandle(Hicon);
+                return newIcon;
+            }
+        }
+
+		private Icon trayIconAvailable = colorToIcon(colorAvailable);
+        private Icon trayIconAvailableIdle = colorToIcon(colorAvailableIdle);
+        private Icon trayIconBusy = colorToIcon(colorBusy);
+		private Icon trayIconBusyIdle = colorToIcon(colorBusyIdle);
+		private Icon trayIconAway = colorToIcon(colorAway);
+		private Icon trayIconDoNotDisturb = colorToIcon(colorDoNotDisturb);
+		private Icon trayIconOff = colorToIcon(colorOff);
+
 
 		public LyncConnectorAppContext()
         {
@@ -121,7 +145,7 @@ namespace LyncPresenceBridge
         {
             trayIcon = new NotifyIcon();
 
-            //The icon is added to the project resources.
+            // The icon is added to the project resources.
             trayIcon.Icon = Properties.Resources.TrayIcon;
 
             // TrayIconContextMenu
@@ -202,6 +226,7 @@ namespace LyncPresenceBridge
         {
             Rgb blinkColor = blinkColorOff;
             byte[] arduinoLeds = arduinoColorOff;
+			Icon trayIcon = trayIconOff;
 
             if (lyncClient.State == ClientState.SignedIn)
             {
@@ -210,37 +235,44 @@ namespace LyncPresenceBridge
                 {
                     case ContactAvailability.Busy:              // Busy
                         blinkColor = blinkColorBusy;
+						trayIcon = trayIconBusy;
                         arduinoLeds = arduinoColorBusy;
                         break;
 
                     case ContactAvailability.BusyIdle:          // Busy and idle
                         blinkColor = blinkColorBusyIdle;
+						trayIcon = trayIconBusyIdle;
                         arduinoLeds = arduinoColorBusyIdle;
                         break;
 
                     case ContactAvailability.Free:              // Available
                         blinkColor = blinkColorAvailable;
+						trayIcon = trayIconAvailable;
                         arduinoLeds = arduinoColorAvailable;
                         break;
 
                     case ContactAvailability.FreeIdle:          // Available and idle
                         blinkColor = blinkColorAvailableIdle;
+						trayIcon = trayIconAvailableIdle;
                         arduinoLeds = arduinoColorAvailableIdle;
                         break;
 
                     case ContactAvailability.Away:              // Inactive/away, off work, appear away
                     case ContactAvailability.TemporarilyAway:   // Be right back
                         blinkColor = blinkColorAway;
+						trayIcon = trayIconAway;
                         arduinoLeds = arduinoColorAway;
                         break;
 
                     case ContactAvailability.DoNotDisturb:      // Do not disturb
                         blinkColor = blinkColorDoNotDisturb;
+						trayIcon = trayIconDoNotDisturb;
                         arduinoLeds = arduinoColorDoNotDisturb;
                         break;
 
                     case ContactAvailability.Offline:           // Offline
                         blinkColor = blinkColorOff;
+						trayIcon = trayIconOff;
                         arduinoLeds = arduinoColorOff;
                         break;
 
@@ -248,8 +280,9 @@ namespace LyncPresenceBridge
                         break;
                 }
 
-                SetBlink1State(blinkColor);
                 arduino.SetLEDs(arduinoLeds);
+                SetBlink1State(blinkColor);
+	            SetIconState(trayIcon);
 
                 Debug.WriteLine(currentAvailability.ToString());
             }
@@ -271,11 +304,9 @@ namespace LyncPresenceBridge
                     Debug.WriteLine("Error setting blink1 to {0},{1},{2}", color.Red, color.Green, color.Blue);
                 }
             }
-
-            SetIconState(color);
-
         }
 
+		/*
         void SetIconState(Rgb color)
         {
             using (Bitmap b = Bitmap.FromHicon(new Icon( Properties.Resources.TrayIcon , 48, 48).Handle))
@@ -295,6 +326,12 @@ namespace LyncPresenceBridge
                 Icon newIcon = Icon.FromHandle(Hicon);
                 trayIcon.Icon = newIcon;
             }
+        }
+		*/
+
+        void SetIconState(Icon newIcon)
+        {
+            trayIcon.Icon = newIcon;
         }
 
         void lyncClient_StateChanged(object sender, ClientStateChangedEventArgs e)
@@ -387,7 +424,7 @@ namespace LyncPresenceBridge
 
 		private void OnApplicationExit(object sender, EventArgs e)
         {
-            //Cleanup so that the icon will be removed when the application is closed
+            // Cleanup so that the icon will be removed when the application is closed
             trayIcon.Visible = false;
 
             // stop (USB) ManagementEventWatcher
@@ -431,26 +468,30 @@ namespace LyncPresenceBridge
 
         private void OffMenuItem_Click(object sender, EventArgs e)
         {
-            SetBlink1State(blinkColorOff);
             arduino.SetLEDs(arduinoColorOff);
+            SetBlink1State(blinkColorOff);
+	        SetIconState(trayIconOff);
         }
 
         private void AwayMenuItem_Click(object sender, EventArgs e)
         {
-            SetBlink1State(blinkColorAway);
             arduino.SetLEDs(arduinoColorAway);
+            SetBlink1State(blinkColorAway);
+	        SetIconState(trayIconAway);
         }
 
         private void BusyMenuItem_Click(object sender, EventArgs e)
         {
-            SetBlink1State(blinkColorBusy);
             arduino.SetLEDs(arduinoColorBusy);
+            SetBlink1State(blinkColorBusy);
+	        SetIconState(trayIconBusy);
         }
 
         private void AvailableMenuItem_Click(object sender, EventArgs e)
         {
-            SetBlink1State(blinkColorAvailable);
             arduino.SetLEDs(arduinoColorAvailable);
+            SetBlink1State(blinkColorAvailable);
+	        SetIconState(trayIconAvailable);
         }
 
         // Watch for USB changes to detect blink(1) removal
