@@ -139,6 +139,7 @@ namespace LyncPresenceBridge
             this.trayIconContextMenu.Items.Add("Available", null, new EventHandler(AvailableMenuItem_Click));
             this.trayIconContextMenu.Items.Add("Busy", null, new EventHandler(BusyMenuItem_Click));
             this.trayIconContextMenu.Items.Add("Away", null, new EventHandler(AwayMenuItem_Click));
+            this.trayIconContextMenu.Items.Add("DoNotDisturb", null, new EventHandler(DoNotDisturbMenuItem_Click));
             this.trayIconContextMenu.Items.Add("Off", null, new EventHandler(OffMenuItem_Click));
 
             // Separation Line
