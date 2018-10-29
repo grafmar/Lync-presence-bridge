@@ -1,0 +1,15 @@
+
+
+   private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (e.CloseReason.Equals(CloseReason.WindowsShutDown))
+        {
+           if (MessageBox.Show("You are closing this app.\n\nAre you sure you wish to exit ?", "Warning: Not Submitted", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Stop) == DialogResult.Yes)
+               return;    
+           else    
+               e.Cancel = true;
+        }
+    }
+
+Thanks Bibhu it worked! </br> But you forgot to initialize the event: this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing); One more question: how can I edit the windows vista and 7 message: "This program is preventing windows from logging off"? 
+
